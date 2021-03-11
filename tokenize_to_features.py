@@ -132,7 +132,14 @@ def tokenize_to_features(set_name, raw_data_file, output_features_file, tokenize
     examples = []
     with open(raw_data_file, 'r') as raw_file:
         for line in raw_file:
-            example_id, query_text, passage_text, label = line.strip().split('\t')
+            tokens = line.strip().split('\t')
+            if len(tokens) == 4:
+                assert set_name == 'train'
+                example_id, query_text, passage_text, label = tokens
+            elif len(tokens) == 3:
+                assert set_name == "dev" or set_name == "test"
+                example_id, query_text, passage_text = tokens
+                label = '0'
             examples.append(InputExample(example_id, query_text, passage_text, label))
     features = convert_examples_to_features(set_name, examples, max_seq_length, tokenizer)
 
@@ -151,7 +158,7 @@ def main():
     ## data
     set_name = 'test' # 'train', 'dev' or 'test'
     raw_data_file = 'PAIRS_FILE'  # contains query passage pairs, format: example_id \t query_text \t passage text (\t label) \n
-    output_features_file = 'FEATURES_FILE'
+    output_features_file = 'FEATURES_FILE' # format: example_id,input_ids,input_mask,segment_ids,label
 
     ## prepare tokenizer
     bert_model_dir = 'BERT_MODEL_DIR' # contains vocab.txt file.

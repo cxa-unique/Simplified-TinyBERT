@@ -49,7 +49,8 @@ def main():
                         default=None,
                         type=str,
                         required=True,
-                        help="The train features file. Should contain the .csv files (after tokenized) for the task.")
+                        help="The train features file. Should contain the .csv files (after tokenized) for the task."
+                             "Format: example_id,input_ids,input_mask,segment_ids,label\n")
     parser.add_argument("--teacher_model",
                         default=None,
                         type=str,
@@ -58,12 +59,13 @@ def main():
                         default=None,
                         type=str,
                         required=True,
-                        help="The student model (after general distillation) dir. Should contain the config/vocab/checkpoint file.")
+                        help="The student model (after general distillation) dir. "
+                             "Should contain the config/vocab/checkpoint file.")
     parser.add_argument("--output_student_dir",
                         default=None,
                         type=str,
                         required=True,
-                        help="The output directory where the task-specific distilled student models will be output.")
+                        help="The output directory for the task-specific distilled student models.")
     parser.add_argument("--cache_file_dir",
                         default='./cache',
                         type=str,

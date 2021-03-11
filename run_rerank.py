@@ -30,7 +30,7 @@ def do_eval(model, eval_dataloader, device):
     return scores
 
 
-def save_probs(args, scores):
+def save_scores(args, scores):
 
     query_psgids_map = []
     with open(args.features_file, mode='r') as ref_file:
@@ -64,12 +64,14 @@ def main():
                         default=None,
                         type=str,
                         required=True,
-                        help="The file contains the features of query-passage pairs.")
+                        help="The file contains the features of query-passage pairs."
+                             "Format: example_id,input_ids,input_mask,segment_ids,label\n")
     parser.add_argument("--output_scores_file",
                         default=None,
                         type=str,
                         required=True,
-                        help="The output prediction from BERT ranker.")
+                        help="The output prediction from BERT ranker."
+                             "Format: query_id\tpassage_id\tscore\n")
     parser.add_argument("--cache_file_dir",
                         default='./cache',
                         type=str,
@@ -86,6 +88,9 @@ def main():
     args = parser.parse_args()
     logger.info('The args: {}'.format(args))
 
+    if not os.path.exists(args.cache_file_dir):
+        os.makedirs(args.cache_file_dir)
+
     os.environ["CUDA_VISIBLE_DEVICES"] = args.device
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -95,7 +100,11 @@ def main():
     _, dataloader = distill_dataloader(args, SequentialSampler, args.eval_batch_size)
 
     scores = do_eval(model, dataloader, device)
-    save_probs(args, scores)
+    save_scores(args, scores)
+
+    if os.path.exists(args.cache_file_dir):
+        import shutil
+        shutil.rmtree(args.cache_file_dir)
 
 if __name__ == "__main__":
     main()
