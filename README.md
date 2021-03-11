@@ -23,7 +23,7 @@ you also need to install [apex](https://www.github.com/nvidia/apex) into your en
 
 ## Getting Started
 In this repository, we provide instructions on how to run 
-Simplified TinyBERT on MS MARCO document ranking dataset.
+Simplified TinyBERT on MS MARCO and TREC 2019 DL document ranking tasks.
 
 ### 1. Data Preparation
 - For general distillation, you can get detail instruction in 
@@ -65,18 +65,23 @@ bash reranker.sh
 Then, you can get relevance scores produced by the BERT ranker. 
 The scores for query-passage pairs should be converted to document rank list 
 in a `TREC` format using `convert_to_trec_results.py` script, wherein the 
-`aggregation` way is set as `MaxP` in our experiments.
+`aggregation` way is set as `MaxP` in our experiments. As for evaluation metrics, 
+you can use [`trec_eval`](https://trec.nist.gov/trec_eval/) 
+or `msmarco_mrr_eval.py` provided in this repo.
 
 ## Resources
-We release some resources for reproducibility and other uses.
+We release some useful resources for the reproducibility of our experiments 
+and other research uses.
 
 * The teacher model and distilled student models:
 
 | Model (L / H)| Path | 
 |--------------|----------|
-| BERT-Base (Teacher) (12 / 768) |  [Download](https://drive.google.com/file/d/1jq6_hYtB6JUri95St9-ftCptB-L1ywKC/view?usp=sharing)    |
+| BERT-Base<sup>*</sup> (Teacher) (12 / 768) |  [Download](https://drive.google.com/file/d/1jq6_hYtB6JUri95St9-ftCptB-L1ywKC/view?usp=sharing)    |
 | Simplified TinyBERT (6 / 768)  |  [Download](https://drive.google.com/file/d/12PoqktIbfuYWgVHcH1d4BJ9ZQ4MBvy-r/view?usp=sharing)    |
 | Simplified TinyBERT (3 / 384)  |  [Download](https://drive.google.com/file/d/1PfVCne3b5BwzdF8i_C1dgrdV0Q5Qj2M4/view?usp=sharing)    |
+<sup>*</sup> Note that the BERT-Base is the same one in [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert), 
+but we convert it to PyTorch model.
 * [Raw text from English Wikipedia for general distillation.](https://drive.google.com/file/d/1Qwy2OKj4JCjkFyQBy4HZK3hYXPwp-JpV/view?usp=sharing)
 * [Train examples for task-specific distillation.](https://drive.google.com/file/d/1si_xxP_yUS--ICEji_qfXeEEzt3dgtpU/view?usp=sharing)
 * [Sampled validation and test queries from MS MARCO Dev set.](https://drive.google.com/drive/folders/1Xx8gAf72jADoLz2NcyiwRdNoq9p-fmBR?usp=sharing)
@@ -84,7 +89,7 @@ We release some resources for reproducibility and other uses.
 * [Run files of Simplified TinyBERT.](https://drive.google.com/drive/folders/1D9HIPsC7OOWRvCwvwP7TjXx2LvDnqONx?usp=sharing)
 
 ## Citation
-If you find this paper/code/resource useful, please cite:
+If you find our paper/code/resources useful, please cite:
 ```
 @article{chen2020simplified,
   title={Simplified TinyBERT: Knowledge Distillation for Document Retrieval},
