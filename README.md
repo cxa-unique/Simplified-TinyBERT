@@ -80,6 +80,7 @@ and other research uses.
 | BERT-Base<sup>*</sup> (Teacher) (12 / 768) |  [Download](https://drive.google.com/file/d/1jq6_hYtB6JUri95St9-ftCptB-L1ywKC/view?usp=sharing)    |
 | Simplified TinyBERT (6 / 768)  |  [Download](https://drive.google.com/file/d/12PoqktIbfuYWgVHcH1d4BJ9ZQ4MBvy-r/view?usp=sharing)    |
 | Simplified TinyBERT (3 / 384)  |  [Download](https://drive.google.com/file/d/1PfVCne3b5BwzdF8i_C1dgrdV0Q5Qj2M4/view?usp=sharing)    |
+
 <sup>*</sup> Note that the BERT-Base is the same one in [dl4marco-bert](https://github.com/nyu-dl/dl4marco-bert), 
 but we convert it to PyTorch model.
 * [Raw text from English Wikipedia for general distillation.](https://drive.google.com/file/d/1Qwy2OKj4JCjkFyQBy4HZK3hYXPwp-JpV/view?usp=sharing)
