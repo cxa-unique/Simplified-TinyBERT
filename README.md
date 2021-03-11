@@ -5,7 +5,7 @@ This repository contains the code and resources for our paper:
 ## Introduction
 Simplified TinyBERT is a knowledge distillation (KD) model on BERT, 
 designed for document retrieval task. Experiments on two widely used 
-benchmarks MS MARCO and TREC 2019 DL Track demonstrate that Simplified 
+benchmarks MS MARCO and TREC 2019 Deep Learning (DL) Track demonstrate that Simplified 
 TinyBERT not only boosts TinyBERT, but also significantly outperforms 
 BERT-Base when providing 15 times speedup.
 
@@ -32,11 +32,11 @@ But we provide the raw text from English Wikipedia used in our experiments, see 
 
 - For task-specific distillation, you can obtain MS MARCO and TREC 2019 DL datasets in the 
 [guidelines](https://microsoft.github.io/msmarco/TREC-Deep-Learning-2019#document-ranking-dataset) 
-for TREC 2019 Deep Learning Track. The train triples are sampled from the corpus,
+for TREC 2019 DL Track. The train triples are sampled from the corpus,
 documents are segmented into passages and positive passages are filtered. 
-After that, you should get training examples: `example_id, query_text, passage_text, label_id`, 
+After that, you should get training examples: `index, query_text, passage_text, label_id`, 
 then you can use `tokenize_to_features.py` script to tokenize examples to the input format of BERT. 
-We release our training examples, see in [Resources](#Resources).
+We release the processed training examples used in our experiments, see in [Resources](#Resources).
 
 ### 2. Model Training
 As the model used is a passage-level BERT ranker, the teacher model used in our experiments 
@@ -48,38 +48,40 @@ Now, distill the model:
 bash ditill.sh
 ```
 You can specify a KD method by setting the `--distill_model` in `'standard', 'simplified'`, 
-which represents the *Standard KD* and *Simplified TinyBERT*, respectively. As for *TinyBERT*, 
+which represents the **Standard KD** and **Simplified TinyBERT**, respectively. As for **TinyBERT**, 
 please refer to [TinyBERT](https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/TinyBERT) repo.
 
 ### 3. Re-ranking
 After distilling, you can re-rank candidates using the distilled models.
 You need to segment candidate documents into passages to get `example_id, query_text, passage_text` pairs, 
 wherein the `example_id` should be `query_id#passage_id`, 
-and tokenize pairs into features using `tokenize_to_features.py` script.
+and tokenize pairs into features using `tokenize_to_features.py` script. 
+We release the pairs of TREC 2019 DL test set, see in [Resources](#Resources).
 
 Now, do BERT inference:
 ```
 bash reranker.sh
 ```
-Then, you can get relevance scores produced by BERT ranker. The scores for query-passage pairs should be
-converted to document rank list in `TREC` format using `convert_to_trec_results.py` script, wherein the 
-`aggregetion` way is set as `MaxP` in our experiments.
+Then, you can get relevance scores produced by the BERT ranker. 
+The scores for query-passage pairs should be converted to document rank list 
+in a `TREC` format using `convert_to_trec_results.py` script, wherein the 
+`aggregation` way is set as `MaxP` in our experiments.
 
 ## Resources
 We release some resources for reproducibility and other uses.
 
-* Distilled BERT models:
+* The teacher model and distilled student models:
 
 | Model (L / H)| Path | 
 |--------------|----------|
-| BERT-Base (Teacher) (12 / 768) |  [Download]()    |
-| Simplified TinyBERT (6 / 768)  |  [Download]()    |
-| Simplified TinyBERT (3 / 384)  |  [Download]()    |
-* [Raw text from wikipedia for general distillation.]()
-* [Train examples for task-specific distillation.]()
-* [Validation and test queries for MS MARCO Dev set.]()
-* [Test pairs of TREC 19 DL for re-ranking.]()
-* [Run files of Simplified TinyBERT.]()
+| BERT-Base (Teacher) (12 / 768) |  [Download](https://drive.google.com/file/d/1jq6_hYtB6JUri95St9-ftCptB-L1ywKC/view?usp=sharing)    |
+| Simplified TinyBERT (6 / 768)  |  [Download](https://drive.google.com/file/d/12PoqktIbfuYWgVHcH1d4BJ9ZQ4MBvy-r/view?usp=sharing)    |
+| Simplified TinyBERT (3 / 384)  |  [Download](https://drive.google.com/file/d/1PfVCne3b5BwzdF8i_C1dgrdV0Q5Qj2M4/view?usp=sharing)    |
+* [Raw text from English Wikipedia for general distillation.](https://drive.google.com/file/d/1Qwy2OKj4JCjkFyQBy4HZK3hYXPwp-JpV/view?usp=sharing)
+* [Train examples for task-specific distillation.](https://drive.google.com/file/d/1si_xxP_yUS--ICEji_qfXeEEzt3dgtpU/view?usp=sharing)
+* [Sampled validation and test queries from MS MARCO Dev set.](https://drive.google.com/drive/folders/1Xx8gAf72jADoLz2NcyiwRdNoq9p-fmBR?usp=sharing)
+* [Test pairs of TREC 2019 DL for re-ranking.](https://drive.google.com/file/d/1DOq4kzF9id-0VbUMG2ibiKhppdxMRbsV/view?usp=sharing)
+* [Run files of Simplified TinyBERT.](https://drive.google.com/drive/folders/1D9HIPsC7OOWRvCwvwP7TjXx2LvDnqONx?usp=sharing)
 
 ## Citation
 If you find this paper/code/resource useful, please cite:
@@ -91,5 +93,6 @@ If you find this paper/code/resource useful, please cite:
   year={2020}
 }
 ```
+
 ## Acknowledgement
 Some snippets of the code are borrowed from [TinyBERT](https://github.com/huawei-noah/Pretrained-Language-Model/tree/master/TinyBERT).
