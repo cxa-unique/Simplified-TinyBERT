@@ -15,6 +15,7 @@ python3 task_distill_simplified.py \
   --teacher_model ${teacher_path} \
   --general_student_model ${general_student_path} \
   --output_student_dir ${output_student_path} \
+  --distill_model ${distill_model_type} \
   --cache_file_dir ${cache_path} \
   --max_seq_length 256 \
   --do_lower_case \

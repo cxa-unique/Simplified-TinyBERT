@@ -71,6 +71,10 @@ def main():
                         type=str,
                         required=True,
                         help="The directory where cache the features.")
+    parser.add_argument("--distill_model",
+                        default='simplified',
+                        type=str,
+                        help="The distill model type, choose in 'standard' and 'simplified'.")
     parser.add_argument("--max_seq_length",
                         default=256,
                         type=int,
@@ -95,6 +99,11 @@ def main():
                         default=2,
                         type=float,
                         help="Total number of training epochs to perform.")
+    parser.add_argument("--alpha",
+                        default=0.5,
+                        type=float,
+                        help="The weight of soft loss in standard kd method."
+                             "Only use when '--distill_model' is set as 'standard'.")
     parser.add_argument("--warmup_proportion",
                         default=0.1,
                         type=float,
@@ -239,46 +248,54 @@ def main():
             if input_ids.size()[0] != args.train_batch_size:
                 continue
 
-            att_loss = 0.
-            rep_loss = 0.
-
             student_logits, student_atts, student_reps = student_model(input_ids, segment_ids, input_mask, is_student=True)
             with torch.no_grad():
                 teacher_logits, teacher_atts, teacher_reps = teacher_model(input_ids, segment_ids, input_mask)
 
-            teacher_layer_num = len(teacher_atts)
-            student_layer_num = len(student_atts)
-            assert teacher_layer_num % student_layer_num == 0
-            layers_per_block = int(teacher_layer_num / student_layer_num)
-            new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
-                                for i in range(student_layer_num)]
-
-            for student_att, teacher_att in zip(student_atts, new_teacher_atts):
-                student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
-                                          student_att)
-                teacher_att = torch.where(teacher_att <= -1e2, torch.zeros_like(teacher_att).to(device),
-                                          teacher_att)
-
-                tmp_loss = loss_mse(student_att, teacher_att)
-                att_loss += tmp_loss
-
-            new_teacher_reps = [teacher_reps[i * layers_per_block] for i in range(student_layer_num + 1)]
-            new_student_reps = student_reps
-            for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
-                tmp_loss = loss_mse(student_rep, teacher_rep)
-                rep_loss += tmp_loss
-
-            tr_att_loss += att_loss.item()
-            tr_rep_loss += rep_loss.item()
-
             soft_loss = soft_cross_entropy(student_logits / args.temperature,
-                                          teacher_logits / args.temperature)
+                                           teacher_logits / args.temperature)
             hard_loss = torch.nn.functional.cross_entropy(student_logits, label_ids, reduction='mean')
-            cls_loss = soft_loss + hard_loss
 
-            tr_cls_loss += cls_loss.item()
+            if args.distill_model == 'standard':
+                cls_loss = args.alpha * soft_loss + (1 - args.alpha) * hard_loss
+                tr_cls_loss += cls_loss.item()
+                loss = cls_loss
+            elif args.distill_model == 'simplified':
+                teacher_layer_num = len(teacher_atts)
+                student_layer_num = len(student_atts)
+                assert teacher_layer_num % student_layer_num == 0
+                layers_per_block = int(teacher_layer_num / student_layer_num)
+                new_teacher_atts = [teacher_atts[i * layers_per_block + layers_per_block - 1]
+                                    for i in range(student_layer_num)]
+                att_loss = 0.
+                rep_loss = 0.
+                # attention loss
+                for student_att, teacher_att in zip(student_atts, new_teacher_atts):
+                    student_att = torch.where(student_att <= -1e2, torch.zeros_like(student_att).to(device),
+                                              student_att)
+                    teacher_att = torch.where(teacher_att <= -1e2, torch.zeros_like(teacher_att).to(device),
+                                              teacher_att)
+                    tmp_loss = loss_mse(student_att, teacher_att)
+                    att_loss += tmp_loss
 
-            loss = rep_loss + att_loss + cls_loss
+                # hidden states loss
+                new_teacher_reps = [teacher_reps[i * layers_per_block] for i in range(student_layer_num + 1)]
+                new_student_reps = student_reps
+                for student_rep, teacher_rep in zip(new_student_reps, new_teacher_reps):
+                    tmp_loss = loss_mse(student_rep, teacher_rep)
+                    rep_loss += tmp_loss
+
+                tr_att_loss += att_loss.item()
+                tr_rep_loss += rep_loss.item()
+
+                # classification loss
+                cls_loss = soft_loss + hard_loss
+                tr_cls_loss += cls_loss.item()
+
+                # total loss
+                loss = rep_loss + att_loss + cls_loss
+            else:
+                raise NotImplementedError
 
             if n_gpu > 1:
                 loss = loss.mean()  # mean() to average on multi-gpu.
