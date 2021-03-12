@@ -1,6 +1,6 @@
 # Simplified-TinyBERT
 This repository contains the code and resources for our paper:
-- [Simplified TinyBERT: Knowledge Distillation for Document Retrieval](https://arxiv.org/abs/2009.07531). In *ECIR 2021*.
+- [Simplified TinyBERT: Knowledge Distillation for Document Retrieval](https://arxiv.org/abs/2009.07531v2). In *ECIR 2021*.
 
 ## Introduction
 Simplified TinyBERT is a knowledge distillation (KD) model on BERT, 
