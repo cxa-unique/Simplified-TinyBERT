@@ -92,11 +92,19 @@ but we convert it to PyTorch model.
 ## Citation
 If you find our paper/code/resources useful, please cite:
 ```
-@article{chen2020simplified,
-  title={Simplified TinyBERT: Knowledge Distillation for Document Retrieval},
-  author={Chen, Xuanang and He, Ben and Hui, Kai and Sun, Le and Sun, Yingfei},
-  journal={arXiv preprint arXiv:2009.07531},
-  year={2020}
+@inproceedings{DBLP:conf/ecir/ChenHHSS21,
+  author    = {Xuanang Chen and
+               Ben He and
+               Kai Hui and
+               Le Sun and
+               Yingfei Sun},
+  title     = {Simplified TinyBERT: Knowledge Distillation for Document Retrieval},
+  booktitle = {{ECIR} {(2)}},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {12657},
+  pages     = {241--248},
+  publisher = {Springer},
+  year      = {2021}
 }
 ```
 
